@@ -1,12 +1,26 @@
-var ENGINE = {}
+var ENGINE = {};
 
-ENGINE.game = ({
 
-	width: 300,
-	height: 150,
-	scale: 2,
-	smo0thing: false,
+ENGINE.Gameover = {
 
+	create: function() {
+		this.app.layer.font("10px Arial");
+		this.text = "Game Over!"
+	},
+
+	step: function(dt) {
+		console.log("test1");
+	},
+
+	render: function(dt) {
+		this.app.layer.clear("black");
+		this.app.layer.fillStyle("white");
+		this.app.layer.fillText(this.text, this.app.width - (this.app.width / 2), this.app.height - (this.app.height/2));
+	}
+
+};
+
+ENGINE.Game = {
 	create: function() {
 
 		this.text;
@@ -20,14 +34,14 @@ ENGINE.game = ({
 			isJump: false,
 			onGround: true,
 
-			yMaxJump: 300,
-			yAcceleration: 25,
+			yMaxJump: 370,
+			yAcceleration: 44,
 			yVelocity: 0,
 
-			gravity: 25,
+			gravity: 35,
 
 			x: 20,
-			y: app.height - this.height
+			y: 20
 		};
 
 		this.ArrayObstacle = [];
@@ -43,8 +57,9 @@ ENGINE.game = ({
 			this.y = app.height - this.height
 		};
 
-		this.seconds = 0
+		this.seconds = 0;
 		this.score = 0;
+		this.gameOver = false;
 
 		this.ArrayObstacle.push( new this.Obstacle );
 	},
@@ -53,7 +68,7 @@ ENGINE.game = ({
 		var Player = this.Player;
 
 		// control
-		if(this.keyboard.keys.up && Player.onGround) {
+		if(this.app.keyboard.keys.up && Player.onGround) {
 			Player.isJump = true;
 			Player.onGround = false;
 			Player.yVelocity = -Player.yMaxJump; 
@@ -94,7 +109,7 @@ ENGINE.game = ({
 
 		// colission
 		if((Player.y + Player.height + 1) > this.app.height) {
-			Player.y = this.layer.height - Player.height;
+			Player.y = this.app.layer.height - Player.height;
 			Player.yVelocity = 0;
 			Player.onGround = true;
 			Player.color = "white";
@@ -107,15 +122,19 @@ ENGINE.game = ({
 				Player.x + Player.width < obstacle.x + obstacle.width &&
 				Player.y + Player.height > obstacle.y &&
 				Player.y + Player.height - 1 < obstacle.y + obstacle.height ) {
-				console.log("colision!!!");
+				this.gameOver = true;
 			}
 
 			if(	Player.x > obstacle.x && 
 				Player.x < obstacle.x + obstacle.width &&
 				Player.y + Player.height > obstacle.y &&
 				Player.y + Player.height - 1 < obstacle.y + obstacle.height ) {
-				console.log("colision!!!");
+				this.gameOver = true;
 			}
+		}
+
+		if(this.gameOver == true) {
+			this.app.setState( ENGINE.Gameover );
 		}
 
 		if(this.seconds == this.obstacleTimeSpawn) this.seconds = 0;
@@ -130,18 +149,18 @@ ENGINE.game = ({
 	render: function(dt) {
 		var Player = this.Player;
 
-		this.layer.clear("black");
+		this.app.layer.clear("black");
 
-		this.layer.fillStyle("white");
-		this.layer.font("10px Arial");
-		this.layer.fillText(this.text ,0 , 10);
+		this.app.layer.fillStyle("white");
+		this.app.layer.font("10px Arial");
+		this.app.layer.fillText(this.text ,0 , 10);
 
-		this.layer.fillStyle(Player.color);
-		this.layer.fillRect(Player.x, Player.y, Player.width, Player.height);
+		this.app.layer.fillStyle(Player.color);
+		this.app.layer.fillRect(Player.x, Player.y, Player.width, Player.height);
 
 		// obstacle
 		for (var i = 0; i < this.ArrayObstacle.length; i++) {
-			this.layer.fillStyle(this.ArrayObstacle[i].color);
+			this.app.layer.fillStyle(this.ArrayObstacle[i].color);
 
 			var width = this.ArrayObstacle[i].width;
 			var height = this.ArrayObstacle[i].height
@@ -149,10 +168,21 @@ ENGINE.game = ({
 			var x = this.ArrayObstacle[i].x
 			var y = this.ArrayObstacle[i].y
 
-			this.layer.fillRect(x, y, width, height)
+			this.app.layer.fillRect(x, y, width, height)
 		}
 	}
 
-});
+};
 
-var app = new PLAYGROUND.Application
+var app = new PLAYGROUND.Application ({
+
+	width: 300,
+	height: 150,
+	scale: 2,
+	smo0thing: false,
+
+	ready: function() {
+		this.setState( ENGINE.Game );
+	},
+
+});
