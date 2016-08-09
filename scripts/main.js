@@ -42,27 +42,24 @@ ENGINE.Game = {
 
 		this.text;
 
-		this.Player = {
-			width: 20,
-			height: 40,
-			color: "white",
+		this.Player = function() {
+			this.width = 20,
+			this.height = 40,
+			this.color = "white",
 	
-			isJump: false,
-			onGround: true,
+			this.isJump = false,
+			this.onGround = true,
 
-			yMaxJump: 320,
-			yAcceleration: 15,
-			yVelocity: 0,
+			this.yMaxJump = 320,
+			this.yAcceleration = 15,
+			this.yVelocity = 0,
 
-			gravity: 15,
+			this.gravity = 15,
 
-			x: 40,
-			y: 110
+			this.x = 40,
+			this.y = app.height - this.height
 		};
 
-		this.ArrayObstacle = [];
-		this.obstacleTimeSpawn = 100;
-		this.obstacleSpeed = 100;
 		this.Obstacle = function() {
 			this.width = 10,
 			this.height = 20,
@@ -73,16 +70,21 @@ ENGINE.Game = {
 			this.y = app.height - this.height
 		};
 
-		this.seconds = 0;
-		this.score = 0;
-		this.gameOver = false;
 
+		this.gameOver = false;
+		this.seconds = score;
+
+		this.obstacleTimeSpawn = 2 ;
+		this.obstacleSpeed = 100;
+
+		this.player = new this.Player;
+		this.ArrayObstacle = [];
 		this.ArrayObstacle.push( new this.Obstacle );
 
 	},
 
 	step: function(dt) {
-		var Player = this.Player;
+		var Player = this.player;
 
 		// control
 		if(this.app.keyboard.keys.up && Player.onGround) {
@@ -105,10 +107,9 @@ ENGINE.Game = {
 		}
 		// logic
 
-		this.seconds++;
-		this.score++;
+		this.seconds = se
 
-		if(this.seconds >= this.obstacleTimeSpawn) {
+		if(score >= this.obstacleTimeSpawn) {
 			this.ArrayObstacle.push(new this.Obstacle );
 		}
 
@@ -165,8 +166,8 @@ ENGINE.Game = {
 					" y:" + Player.y;
 	},
 
-	render: function() {
-		var Player = this.Player;
+	render: function(dt) {
+		var Player = this.player;
 
 		this.app.layer.clear("black");
 
