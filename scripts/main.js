@@ -1,15 +1,23 @@
 var ENGINE = {};
 
+var timer;
+var score = 0;
+function scoreTimer() {
+	score++;
+}
 
 ENGINE.Gameover = {
 
 	create: function() {
 		this.app.layer.font("10px Arial");
-		this.text = "Game Over!"
+		this.text = "Game Over! Your score is " + score;
+		clearInterval(scoreTimer);
 	},
 
 	step: function(dt) {
-		console.log("test1");
+		if(this.app.keyboard.keys.up) {
+			this.app.setState( ENGINE.Game );
+		}
 	},
 
 	render: function(dt) {
@@ -24,7 +32,6 @@ ENGINE.Game = {
 	create: function() {
 
 		this.text;
-		this.app = app;
 
 		this.Player = {
 			width: 20,
@@ -40,13 +47,13 @@ ENGINE.Game = {
 
 			gravity: 35,
 
-			x: 20,
-			y: 20
+			x: 40,
+			y: 110
 		};
 
 		this.ArrayObstacle = [];
 		this.obstacleTimeSpawn = 50;
-		this.obstacleSpeed = 100;
+		this.obstacleSpeed = 200;
 		this.Obstacle = function() {
 			this.width = 10,
 			this.height = 20,
@@ -61,7 +68,11 @@ ENGINE.Game = {
 		this.score = 0;
 		this.gameOver = false;
 
+		score = 0;
+		setInterval(scoreTimer, 1000);
+
 		this.ArrayObstacle.push( new this.Obstacle );
+
 	},
 
 	step: function(dt) {
@@ -134,6 +145,7 @@ ENGINE.Game = {
 		}
 
 		if(this.gameOver == true) {
+			this.gameOver = false;
 			this.app.setState( ENGINE.Gameover );
 		}
 
@@ -141,9 +153,10 @@ ENGINE.Game = {
 
 		this.text = "pv:" + Player.yVelocity + 
 					" dt:" + dt + 
-					" s:" + this.seconds + 
-					" s:" + this.score / 10 +
-					" arrobst:" + this.ArrayObstacle.length;
+					" s:" + score +
+					" arrobst:" + this.ArrayObstacle.length +
+					" x:" + Player.x +
+					" y:" + Player.y;
 	},
 
 	render: function(dt) {
@@ -174,7 +187,7 @@ ENGINE.Game = {
 
 };
 
-var app = new PLAYGROUND.Application ({
+var app = playground ({
 
 	width: 300,
 	height: 150,
