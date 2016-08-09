@@ -11,7 +11,6 @@ ENGINE.Gameover = {
 	create: function() {
 		this.app.layer.font("10px Arial");
 		this.text = "Game Over! Your score is " + score;
-		clearInterval(scoreTimer);
 	},
 
 	step: function(dt) {
@@ -20,7 +19,7 @@ ENGINE.Gameover = {
 		}
 	},
 
-	render: function(dt) {
+	render: function() {
 		this.app.layer.clear("black");
 		this.app.layer.fillStyle("white");
 		this.app.layer.fillText(this.text, this.app.width - (this.app.width / 2), this.app.height - (this.app.height/2));
@@ -29,6 +28,16 @@ ENGINE.Gameover = {
 };
 
 ENGINE.Game = {
+
+	enter: function() {
+		score = 0;
+		timer = setInterval(scoreTimer, 1000);
+	},
+
+	leave: function() {
+		clearInterval(timer);
+	},
+
 	create: function() {
 
 		this.text;
@@ -41,19 +50,19 @@ ENGINE.Game = {
 			isJump: false,
 			onGround: true,
 
-			yMaxJump: 370,
-			yAcceleration: 44,
+			yMaxJump: 320,
+			yAcceleration: 15,
 			yVelocity: 0,
 
-			gravity: 35,
+			gravity: 15,
 
 			x: 40,
 			y: 110
 		};
 
 		this.ArrayObstacle = [];
-		this.obstacleTimeSpawn = 50;
-		this.obstacleSpeed = 200;
+		this.obstacleTimeSpawn = 100;
+		this.obstacleSpeed = 100;
 		this.Obstacle = function() {
 			this.width = 10,
 			this.height = 20,
@@ -67,9 +76,6 @@ ENGINE.Game = {
 		this.seconds = 0;
 		this.score = 0;
 		this.gameOver = false;
-
-		score = 0;
-		setInterval(scoreTimer, 1000);
 
 		this.ArrayObstacle.push( new this.Obstacle );
 
@@ -159,7 +165,7 @@ ENGINE.Game = {
 					" y:" + Player.y;
 	},
 
-	render: function(dt) {
+	render: function() {
 		var Player = this.Player;
 
 		this.app.layer.clear("black");
