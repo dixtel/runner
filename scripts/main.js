@@ -1,19 +1,31 @@
 var ENGINE = {};
 
-var timer;
+var timer1;
 var score = 0;
 function scoreTimer() {
 	score++;
 }
 
+var timer2;
+var spawnTime = 0;
+function spawnTimer() {
+	spawnTime += 0.1;
+}
+
 ENGINE.Gameover = {
 
 	create: function() {
-		this.app.layer.font("10px Arial");
-		this.text = "Game Over! Your score is " + score;
+		this.bestScore = score;
 	},
 
 	step: function(dt) {
+		this.gameOverText = "Game Over! Your score is " + score + ", the best score is " + this.bestScore; 
+		if(this.bestScore < score) {
+			this.bestScore = score;
+			this.gameOverText = "Game Over! Your score is " + score + ", the best score is " + this.bestScore; 
+
+		}
+
 		if(this.app.keyboard.keys.up) {
 			this.app.setState( ENGINE.Game );
 		}
@@ -22,7 +34,8 @@ ENGINE.Gameover = {
 	render: function() {
 		this.app.layer.clear("black");
 		this.app.layer.fillStyle("white");
-		this.app.layer.fillText(this.text, this.app.width - (this.app.width / 2), this.app.height - (this.app.height/2));
+		this.app.layer.font("13px Arial");
+		this.app.layer.fillText(this.gameOverText, 13, 19 );
 	}
 
 };
@@ -31,16 +44,28 @@ ENGINE.Game = {
 
 	enter: function() {
 		score = 0;
-		timer = setInterval(scoreTimer, 1000);
+		timer1 = setInterval(scoreTimer, 500);
+
+		spawnTime = 0;
+		timer2 = setInterval(spawnTimer, 100);
+
+		this.player = new this.Player;
+		this.ArrayObstacle = [];
+		this.ArrayObstacle.push( new this.Obstacle );
+
+		this.obstacleTimeSpawn = 2;
+		this.obstacleSpeed = 100;
+
 	},
 
 	leave: function() {
-		clearInterval(timer);
+		clearInterval(timer1);
+		clearInterval(timer2);
 	},
 
 	create: function() {
 
-		this.text;
+		this.textScore;
 
 		this.Player = function() {
 			this.width = 20,
@@ -72,15 +97,6 @@ ENGINE.Game = {
 
 
 		this.gameOver = false;
-		this.seconds = score;
-
-		this.obstacleTimeSpawn = 2 ;
-		this.obstacleSpeed = 100;
-
-		this.player = new this.Player;
-		this.ArrayObstacle = [];
-		this.ArrayObstacle.push( new this.Obstacle );
-
 	},
 
 	step: function(dt) {
@@ -107,9 +123,7 @@ ENGINE.Game = {
 		}
 		// logic
 
-		this.seconds = se
-
-		if(score >= this.obstacleTimeSpawn) {
+		if(spawnTime >= this.obstacleTimeSpawn) {
 			this.ArrayObstacle.push(new this.Obstacle );
 		}
 
@@ -120,6 +134,15 @@ ENGINE.Game = {
 		for (var i = 0; i < this.ArrayObstacle.length; i++) {
 			if(this.ArrayObstacle[i].x <= -Player.width) this.ArrayObstacle.shift();
 		}
+
+		if(spawnTime >= this.obstacleTimeSpawn) {
+			clearInterval(timer2);
+			spawnTime = 0;
+			timer2 = setInterval(spawnTimer, 100);
+		}
+
+		this.obstacleTimeSpawn -= 0.0002;
+		this.obstacleSpeed += 0.05;
 
 
 		// finish calculate
@@ -158,12 +181,8 @@ ENGINE.Game = {
 
 		if(this.seconds == this.obstacleTimeSpawn) this.seconds = 0;
 
-		this.text = "pv:" + Player.yVelocity + 
-					" dt:" + dt + 
-					" s:" + score +
-					" arrobst:" + this.ArrayObstacle.length +
-					" x:" + Player.x +
-					" y:" + Player.y;
+		this.textScore = score 
+
 	},
 
 	render: function(dt) {
@@ -172,8 +191,9 @@ ENGINE.Game = {
 		this.app.layer.clear("black");
 
 		this.app.layer.fillStyle("white");
-		this.app.layer.font("10px Arial");
-		this.app.layer.fillText(this.text ,0 , 10);
+		this.app.layer.font("15px Arial");
+
+		this.app.layer.fillText(this.textScore ,200, 19);
 
 		this.app.layer.fillStyle(Player.color);
 		this.app.layer.fillRect(Player.x, Player.y, Player.width, Player.height);
